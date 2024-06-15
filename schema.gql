@@ -1,0 +1,68 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateUserInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
+type ErrorResponse {
+  message: String!
+  path: String!
+}
+
+"""New recipe data"""
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LoginResponse {
+  token: String!
+  user: User!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  removeUser(id: Int!): User!
+  signIn(loginInput: LoginInput!): LoginResponse
+  signUp(signupInput: SignupInput!): [ErrorResponse!]
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  getProfile: User!
+  user(id: Int!): User!
+}
+
+"""New recipe data"""
+input SignupInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  email: String
+  id: Int!
+  name: String
+  password: String
+}
+
+type User {
+  """Example field (placeholder)"""
+  email: String!
+
+  """Example field (placeholder)"""
+  firstName: String!
+
+  """Example field (placeholder)"""
+  id: Int!
+
+  """Example field (placeholder)"""
+  lastName: String!
+
+  """Example field (placeholder)"""
+  password: String!
+}
