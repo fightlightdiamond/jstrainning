@@ -235,3 +235,177 @@ model ArticleImage {
   updatedAt DateTime @default(now())
   article   Article  @relation(fields: [articleId], references: [id])
 }
+
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Epic {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  projectId   Int
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model Story {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  authorId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  author      User     @relation(fields: [authorId], references: [id])
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("Pending")
+  priority    Int       @default(1)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
+}
+
+model SubTask {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("Pending")
+  priority    Int       @default(1)
+  statTime    DateTime?
+  endTime     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  taskId      Int
+  task        Task      @relation(fields: [taskId], references: [id])
+}
+
+
+model BugInSubTask {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("Open")
+  priority    Int       @default(1)
+  like        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  subTaskIdId   Int
+  subTask     SubTask   @relation(fields: [subTaskIdId], references: [id])
+
+model Bug {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("Open")
+  priority    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
+}
+
+model Backlog {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("Pending")
+  priority    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
+}
+
+model Sprint {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  projectId   Int
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model Version {
+  id            Int      @id @default(autoincrement())
+  versionNumber String
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  projectId     Int
+  project       Project  @relation(fields: [projectId], references: [id])
+}
+
+model UserTask {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  taskId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id])
+}
+
+model UserSubTask {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  subTaskId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  subTask    SubTask  @relation(fields: [subTaskId], references: [id])
+}
+
+model UserBug {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  bugId           Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+  bug             Bug      @relation(fields: [bugId], references: [id])
+  coefficient     Coefficient? @relation(fields: [coefficientId], references: [id])
+  coefficientId   Int?
+}
+
+model Coefficient {
+  id              Int      @id @default(autoincrement())
+  name            String
+  complexityLevel Int
+  uncertaintyLevel Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  projectId       Int
+  project         Project  @relation(fields: [projectId], references: [id])
+}
+
+model TaskCoefficient {
+  id                  Int      @id @default(autoincrement())
+  taskId              Int
+  coefficientId       Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  task                Task     @relation(fields: [taskId], references: [id])
+  coefficient         Coefficient     @relation(fields: [coefficientId], references: [id])
+}

@@ -16,4 +16,6 @@ export const queueConfigAsync: any = {
   inject: [ConfigService],
   useFactory: (configService: ConfigService): QueueOptions =>
     QueueConfig.getConfig(configService),
+  cache: true,
+  expandVariables: true,
 };

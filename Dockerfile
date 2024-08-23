@@ -1,14 +1,32 @@
-# use an existing docker image as a base
-FROM node:16
+FROM node:19-alpine as development
 
-# Download and install a dependency
-WORKDIR ./app
-COPY ./package.json .
-RUN npm install
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install glob rimraf
+
+RUN npm install --only=development
+
 COPY . .
 
-# Tell the image what to do when it starts
-# As a container
-CMD ["npm", "run", "start:debug"]
+RUN npm run build
 
-EXPOSE 4000
+CMD [ "npm", "run", "start:dev" ]
+
+FROM node:19-alpine as production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+COPY . .
+
+COPY --from=development /usr/src/app/dist ./dist
+
+CMD [ "node", "dist/main" ]
