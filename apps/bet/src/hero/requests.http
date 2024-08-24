@@ -1,0 +1,6 @@
+POST http://localhost:3000/api/heroes
+content-type: application/json
+
+{
+  "name": "Dr Nice"
+}

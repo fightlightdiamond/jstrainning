@@ -30,7 +30,6 @@ export interface IHero extends IHeroBase {
   img?: string;
 }
 
-
 export class HeroAttribute implements IHeroAttribute {
   name: number;
   hp: number;
@@ -51,4 +50,3 @@ export class HeroAttribute implements IHeroAttribute {
   intrinsicStatus?: number;
   effectResistance?: number;
 }
-

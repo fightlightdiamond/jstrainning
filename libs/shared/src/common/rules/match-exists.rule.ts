@@ -12,11 +12,11 @@ export class MatchExistsRule implements ValidatorConstraintInterface {
   constructor(private prismaService: PrismaService) {}
 
   async validate(value: number) {
-      return !!await this.prismaService.match.findFirst({
-        where: {
-          id: value,
-        }
-      });
+    return !!(await this.prismaService.match.findFirst({
+      where: {
+        id: value,
+      },
+    }));
   }
 
   defaultMessage(args: ValidationArguments) {

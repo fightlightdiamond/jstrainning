@@ -24,7 +24,11 @@ export class FightingService {
     const match = await this.matchRepository.query().findFirst({
       where: { id },
       select: {
-        'id': true, heroInfo: true, 'turns': true, 'status': true, 'startTime': true
+        id: true,
+        heroInfo: true,
+        turns: true,
+        status: true,
+        startTime: true,
       },
     });
 
@@ -32,14 +36,12 @@ export class FightingService {
       throw new HttpException('Match not found', HttpStatus.NOT_FOUND);
     }
 
-    await this.matchRepository.query().update(
-      {
-        where: { id: match.id },
-        data: {
-          status: BetStatusConstant.FIGHTING,
-        },
-      }
-    );
+    await this.matchRepository.query().update({
+      where: { id: match.id },
+      data: {
+        status: BetStatusConstant.FIGHTING,
+      },
+    });
 
     match.status = BetStatusConstant.FIGHTING;
     const data: ISocketQueueContract = {

@@ -15,7 +15,7 @@ export class UserHeroExistsRule implements ValidatorConstraintInterface {
     return !!(await this.prismaService.user.findFirst({
       where: {
         id: value,
-      }
+      },
     }));
   }
 

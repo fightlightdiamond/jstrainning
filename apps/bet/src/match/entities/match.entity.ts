@@ -1,5 +1,8 @@
 import { IMatchLog } from '@app/shared/common/interfaces/match-log.interface';
-import { IHero, IHeroAttribute } from '@app/shared/common/interfaces/hero.interface';
+import {
+  IHero,
+  IHeroAttribute,
+} from '@app/shared/common/interfaces/hero.interface';
 
 export class Match implements IMatchLog {
   atk: number;

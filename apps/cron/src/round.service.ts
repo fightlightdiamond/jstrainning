@@ -37,12 +37,12 @@ export class RoundService {
    * @param away
    */
   preBet(home: IHero, away: IHero) {
-    console.log({home, away})
+    console.log({ home, away });
     this.turnNumber = 1;
     this.home = new HeroLog().setHome(home);
-    console.log('Home')
+    console.log('Home');
     this.away = new HeroLog().setHome(away);
-    console.log('away')
+    console.log('away');
     this.turns = [];
     this.heroInfo = [_.cloneDeep(this.home), _.cloneDeep(this.away)];
 

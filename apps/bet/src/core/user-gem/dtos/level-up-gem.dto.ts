@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsInt, IsNumber, IsString, Max, Min } from 'class-validator';
+import { IsEnum, isEnum, IsIn, IsInt, IsNumber, IsString, Max, Min } from 'class-validator';
 import { GemLevelUpConstant } from '../constants/gem-level-up.constant';
 import { GemTypeConstant } from '../constants/gem-type.constant';
+import { Type } from 'class-transformer';
 
 export class LevelUpGemDto {
   @ApiProperty({
@@ -14,10 +15,9 @@ export class LevelUpGemDto {
   @Min(1)
   level: number;
 
-  @ApiProperty({ description: 'Gems type', required: true })
-  @IsString()
-  @IsIn(Object.values(GemTypeConstant))
-  type: string;
+  @ApiProperty({ description: 'Gems type', required: true, enum: GemTypeConstant })
+  @IsEnum(GemTypeConstant)
+  type: GemTypeConstant;
 
   @ApiProperty({
     description: 'Number of gems you want to use for level up',

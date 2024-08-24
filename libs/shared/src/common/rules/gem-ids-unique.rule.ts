@@ -14,7 +14,6 @@ export class GemIdsUniqueRule implements ValidatorConstraintInterface {
     });
 
     return gemIdsUnique.length >= lenghBefore;
-
   }
 
   defaultMessage() {

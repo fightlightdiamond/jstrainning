@@ -3,15 +3,14 @@ import { PrismaService } from '@app/prisma';
 
 @Injectable()
 export class HeroExistsPipe implements PipeTransform {
-  constructor(private prismaService: PrismaService) {
-  }
+  constructor(private prismaService: PrismaService) {}
 
   async transform(value: any) {
     try {
       await this.prismaService.hero.findFirst({
-        where: {id: value,}
+        where: { id: value },
       });
-    } catch (e) {
+    } catch (error) {
       throw new BadRequestException('Hero not found');
     }
 

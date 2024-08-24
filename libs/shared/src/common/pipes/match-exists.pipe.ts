@@ -3,15 +3,13 @@ import { PrismaService } from '@app/prisma';
 
 @Injectable()
 export class MatchExistsPipe implements PipeTransform {
-  constructor(private prismaService: PrismaService) {
-  }
+  constructor(private prismaService: PrismaService) {}
 
   async transform(value: any) {
-
     const match = await this.prismaService.match.findFirst({
       where: {
-        id: value
-      }
+        id: value,
+      },
     });
 
     if (match) {
@@ -19,6 +17,5 @@ export class MatchExistsPipe implements PipeTransform {
     }
 
     throw new BadRequestException('Match not found');
-
   }
 }

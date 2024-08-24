@@ -15,7 +15,7 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_USER=hero
       - POSTGRES_PASSWORD=hero
-      - POSTGRES_DB=hero
+      - POSTGRES_DB=postgres
     ports:
       - '5432:5432'
   mailhog:

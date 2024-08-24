@@ -12,12 +12,12 @@ export class UserExistsRule implements ValidatorConstraintInterface {
   constructor(private prismaService: PrismaService) {}
 
   async validate(value: number) {
-      const user = await this.prismaService.user.findFirst({
-        where: {
-          id: value,
-        }
-      });
-      return !!user;
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: value,
+      },
+    });
+    return !!user;
   }
 
   defaultMessage(args: ValidationArguments) {

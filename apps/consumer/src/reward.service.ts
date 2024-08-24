@@ -11,9 +11,8 @@ export class RewardService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly userGemService: UserGemService,
-    @InjectQueue('socket.io') private readonly queue: Queue
-  ) {
-  }
+    @InjectQueue('socket.io') private readonly queue: Queue,
+  ) {}
 
   /**
    * TODO: chưa test
@@ -21,29 +20,27 @@ export class RewardService {
   async execute(id: number) {
     const match = await this.prismaService.match.findFirst({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
     const { winner } = match;
 
     console.log({ winner, id });
 
-    await this.prismaService.match.update(
-      {
-        where: { id: match.id },
-        data: {
-          status: BetStatusConstant.END
-        }
-      }
-    );
+    await this.prismaService.match.update({
+      where: { id: match.id },
+      data: {
+        status: BetStatusConstant.END,
+      },
+    });
 
     const bets = await this.prismaService.bet.findMany({
       where: {
         matchId: id,
-        heroId: winner
+        heroId: winner,
       },
-      select: { 'userId': true, 'balance': true, 'matchId': true, 'heroId': true }
+      select: { userId: true, balance: true, matchId: true, heroId: true },
     });
 
     console.log({ bets });
@@ -54,23 +51,21 @@ export class RewardService {
     const ps = [];
     for (const bet of bets) {
       ps.push(
-        this.prismaService.user.update(
-          {
-            where: {
-              id: bet.userId
+        this.prismaService.user.update({
+          where: {
+            id: bet.userId,
+          },
+          data: {
+            balance: {
+              increment: bet.balance * 2,
             },
-            data: {
-              balance: {
-                increment: bet.balance * 2
-              }
-            }
-          }
-        )
+          },
+        }),
       );
       if (this.userGemService.isDropGem()) {
         ps.push(this.userGemService.add(bet.userId));
         console.log(
-          `-------    User has id:${bet.userId} earned gem    --------`
+          `-------    User has id:${bet.userId} earned gem    --------`,
         );
       }
     }
@@ -79,7 +74,7 @@ export class RewardService {
     await this.queue.add(NameQueueConstant.ROOM_QUEUE, {
       room: 'all',
       event: 'reward',
-      data: bets
+      data: bets,
     });
   }
 }

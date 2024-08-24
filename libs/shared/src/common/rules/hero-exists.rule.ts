@@ -12,11 +12,11 @@ export class HeroExistsRule implements ValidatorConstraintInterface {
   constructor(private prismaService: PrismaService) {}
 
   async validate(value: number) {
-    return !!await this.prismaService.hero.findFirst({
-        where: {
-          id: value,
-        }
-      });
+    return !!(await this.prismaService.hero.findFirst({
+      where: {
+        id: value,
+      },
+    }));
   }
 
   defaultMessage(args: ValidationArguments) {

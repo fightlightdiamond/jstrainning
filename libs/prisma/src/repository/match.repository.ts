@@ -7,7 +7,7 @@ export class MatchRepository {
 
   async save(match: any): Promise<any> {
     return this.prisma.match.create({
-      data: match
+      data: match,
     });
   }
 

@@ -36,7 +36,7 @@ export default class RedisConfig {
   }
 }
 
-export const redisConfigAsync: any = {
+export const redisConfigAsync = {
   imports: [ConfigModule],
   inject: [ConfigService],
   useFactory: (configService: ConfigService): Redis.RedisOptions =>

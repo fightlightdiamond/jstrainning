@@ -40,6 +40,6 @@ export class AuthResolver {
   @UseGuards(GqlAuthGuard)
   @Query(() => User)
   getProfile(@Context() context) {
-    return context?.req?.user
+    return context?.req?.user;
   }
 }

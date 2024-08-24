@@ -15,7 +15,7 @@ export class EmailExistsRule implements ValidatorConstraintInterface {
     return !!(await this.prismaService.user.findFirst({
       where: {
         email: value,
-      }
+      },
     }));
   }
 

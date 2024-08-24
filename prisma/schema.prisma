@@ -10,6 +10,15 @@ enum Gender {
   OTHER
 }
 
+enum GemType {
+  HP
+  ATK
+  DEF
+  CRIT_RATE
+  CRIT_DMG
+  SPD
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,18 +29,24 @@ datasource db {
 }
 
 model User {
-  id          Int        @id @default(autoincrement())
-  email       String     @unique
-  lastName        String?
-  firstName        String?
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  lastName    String?
+  firstName   String?
   password    String
-  userStatus  String?    @default("Active")
-  phoneNumber String?    @unique
-  balance   BigInt       @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now())
+  userStatus  String?       @default("Active")
+  phoneNumber String?       @unique
+  balance     BigInt        @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
   comments    Comment[]
   likes       Like[]
+  Project     Project[]
+  Story       Story[]
+  UserTask    UserTask[]
+  UserSubTask UserSubTask[]
+  UserBug     UserBug[]
+  UserGem     UserGem[]
 }
 
 model AutoBet {
@@ -52,9 +67,9 @@ model Bet {
   matchId   Int
   heroId    Int
   balance   Int
-  result    Boolean @default(false)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  result    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EloMath {
@@ -70,7 +85,7 @@ model GuildCurrency {
 }
 
 model GuildMatch {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   heroInfo   Json
   turns      Json?
   startTime  DateTime?
@@ -84,23 +99,23 @@ model GuildMatch {
 }
 
 model Hero {
-  id               Int @id @default(autoincrement())
-  acc              Int @default(0)
-  atk              Int @default(1000)
-  atkHealing       Int @default(0)
-  cc               Int @default(0)
-  critDmg          Int @default(175)
-  critRate         Int @default(20)
-  def              Int @default(15)
-  dodge            Int @default(1)
-  effectResistance Int @default(0)
-  intrinsicStatus  Int @default(0)
-  element          Int @default(0)
-  hp               Int @default(10000)
-  name             String @unique
+  id               Int       @id @default(autoincrement())
+  acc              Int       @default(0)
+  atk              Int       @default(1000)
+  atkHealing       Int       @default(0)
+  cc               Int       @default(0)
+  critDmg          Int       @default(175)
+  critRate         Int       @default(20)
+  def              Int       @default(15)
+  dodge            Int       @default(1)
+  effectResistance Int       @default(0)
+  intrinsicStatus  Int       @default(0)
+  element          Int       @default(0)
+  hp               Int       @default(10000)
+  name             String    @unique
   position         String?
-  spd              Int @default(200)
-  status           Int @default(1)
+  spd              Int       @default(200)
+  status           Int       @default(1)
   story            String?
   guide            String?
   createdAt        DateTime?
@@ -108,41 +123,46 @@ model Hero {
 }
 
 model Match {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   heroInfo   Json?
   turns      Json?
   startTime  DateTime?
-  turnNumber Int        @default(0)
+  turnNumber Int       @default(0)
   status     Int
   winner     Int
   loser      Int
-  type       Int?       @default(0)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  type       Int?      @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model UserGem {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id           Int      @id @default(autoincrement())
+  name         String?
+  userId       Int
+  level        Int
+  availableNum Int
+  type         GemType
+  attachedNum  Int      @default(0)
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model UserHero {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserSetting {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Operation {
@@ -236,83 +256,94 @@ model ArticleImage {
   article   Article  @relation(fields: [articleId], references: [id])
 }
 
-
 model Project {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   name        String
   description String?
   startDate   DateTime
   endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
   userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  Epic        Epic[]
+  Task        Task[]
+  Bug         Bug[]
+  Backlog     Backlog[]
+  Sprint      Sprint[]
+  Version     Version[]
+  Coefficient Coefficient[]
 }
 
 model Epic {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   startDate   DateTime
   endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  projectId   Int
-  project     Project  @relation(fields: [projectId], references: [id])
-}
-
-model Story {
-  id          Int      @id @default(autoincrement())
-  title       String
-  content     String
-  authorId    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  author      User     @relation(fields: [authorId], references: [id])
-}
-
-model Task {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  status      String    @default("Pending")
-  priority    Int       @default(1)
-  dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   projectId   Int
   project     Project   @relation(fields: [projectId], references: [id])
 }
 
-model SubTask {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  status      String    @default("Pending")
-  priority    Int       @default(1)
-  statTime    DateTime?
-  endTime     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  taskId      Int
-  task        Task      @relation(fields: [taskId], references: [id])
+model Story {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
 }
 
+model Task {
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?
+  status          String            @default("Pending")
+  priority        Int               @default(1)
+  dueDate         DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+  projectId       Int
+  project         Project           @relation(fields: [projectId], references: [id])
+  SubTask         SubTask[]
+  UserTask        UserTask[]
+  TaskCoefficient TaskCoefficient[]
+}
+
+model SubTask {
+  id           Int            @id @default(autoincrement())
+  title        String
+  description  String?
+  status       String         @default("Pending")
+  priority     Int            @default(1)
+  statTime     DateTime?
+  endTime      DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  taskId       Int
+  task         Task           @relation(fields: [taskId], references: [id])
+  BugInSubTask BugInSubTask[]
+  UserSubTask  UserSubTask[]
+}
 
 model BugInSubTask {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  status      String    @default("Open")
-  priority    Int       @default(1)
-  like        Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  subTaskIdId   Int
-  subTask     SubTask   @relation(fields: [subTaskIdId], references: [id])
+  status      String   @default("Open")
+  priority    Int      @default(1)
+  like        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  subTaskIdId Int
+  subTask     SubTask  @relation(fields: [subTaskIdId], references: [id])
+}
 
 model Bug {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   status      String    @default("Open")
@@ -321,30 +352,31 @@ model Bug {
   updatedAt   DateTime  @default(now())
   projectId   Int
   project     Project   @relation(fields: [projectId], references: [id])
+  UserBug     UserBug[]
 }
 
 model Backlog {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  status      String    @default("Pending")
-  priority    Int       @default(1)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
-  projectId   Int
-  project     Project   @relation(fields: [projectId], references: [id])
-}
-
-model Sprint {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  startDate   DateTime
-  endDate     DateTime?
+  status      String   @default("Pending")
+  priority    Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
   projectId   Int
   project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model Sprint {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
 }
 
 model Version {
@@ -368,44 +400,46 @@ model UserTask {
 }
 
 model UserSubTask {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  subTaskId  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
-  subTask    SubTask  @relation(fields: [subTaskId], references: [id])
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  subTaskId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  subTask   SubTask  @relation(fields: [subTaskId], references: [id])
 }
 
 model UserBug {
-  id              Int      @id @default(autoincrement())
-  userId          Int
-  bugId           Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
-  user            User     @relation(fields: [userId], references: [id])
-  bug             Bug      @relation(fields: [bugId], references: [id])
-  coefficient     Coefficient? @relation(fields: [coefficientId], references: [id])
-  coefficientId   Int?
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  bugId         Int
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now())
+  user          User         @relation(fields: [userId], references: [id])
+  bug           Bug          @relation(fields: [bugId], references: [id])
+  coefficient   Coefficient? @relation(fields: [coefficientId], references: [id])
+  coefficientId Int?
 }
 
 model Coefficient {
-  id              Int      @id @default(autoincrement())
-  name            String
-  complexityLevel Int
+  id               Int               @id @default(autoincrement())
+  name             String
+  complexityLevel  Int
   uncertaintyLevel Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
-  projectId       Int
-  project         Project  @relation(fields: [projectId], references: [id])
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  projectId        Int
+  project          Project           @relation(fields: [projectId], references: [id])
+  UserBug          UserBug[]
+  TaskCoefficient  TaskCoefficient[]
 }
 
 model TaskCoefficient {
-  id                  Int      @id @default(autoincrement())
-  taskId              Int
-  coefficientId       Int
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @default(now()) @updatedAt
-  task                Task     @relation(fields: [taskId], references: [id])
-  coefficient         Coefficient     @relation(fields: [coefficientId], references: [id])
+  id            Int         @id @default(autoincrement())
+  taskId        Int
+  coefficientId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  task          Task        @relation(fields: [taskId], references: [id])
+  coefficient   Coefficient @relation(fields: [coefficientId], references: [id])
 }

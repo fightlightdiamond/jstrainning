@@ -4,14 +4,13 @@ import { PrismaService } from '@app/prisma';
 
 @Injectable()
 export class UserExistsPipe implements PipeTransform {
-  constructor(private prismaService: PrismaService) {
-  }
+  constructor(private prismaService: PrismaService) {}
 
-  async transform(value: any) {
+  async transform(value: number) {
     const user = await this.prismaService.user.findFirst({
       where: {
-        id: value
-      }
+        id: value,
+      },
     });
     if (user) {
       return value;

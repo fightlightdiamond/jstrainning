@@ -3,7 +3,8 @@ import { Hero } from '@app/shared/common/utils/hero.util';
 import { IMatchLog } from '@app/shared/common/interfaces/match-log.interface';
 import {
   HeroAttribute,
-  IHero, IHeroAttribute
+  IHero,
+  IHeroAttribute,
 } from '@app/shared/common/interfaces/hero.interface';
 
 export class HeroLog extends Hero implements IMatchLog {
@@ -25,7 +26,7 @@ export class HeroLog extends Hero implements IMatchLog {
    * Set Attribute
    */
   setCurrent(): IMatchLog {
-    this.current = new HeroAttribute()
+    this.current = new HeroAttribute();
     this.current.hp = this.hp;
     this.current.atk = this.atk;
     this.current.def = this.def;
@@ -69,7 +70,7 @@ export class HeroLog extends Hero implements IMatchLog {
    */
   setHome(home: IHero): IMatchLog {
     for (const [key, value] of Object.entries(home)) {
-      console.log(key, value)
+      console.log(key, value);
       this[key] = value;
     }
 

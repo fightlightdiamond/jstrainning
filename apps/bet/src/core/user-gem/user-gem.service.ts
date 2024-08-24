@@ -3,24 +3,24 @@ import { GemLevelUpConstant } from './constants/gem-level-up.constant';
 import { GemTypeConstant } from './constants/gem-type.constant';
 import { GetGemsDto } from './dtos/get-gems.dto';
 import { LevelUpGemDto } from './dtos/level-up-gem.dto';
-import { UserGemRepository } from '@app/prisma/repository/user-gem.repository';
 import { GEM_COMMON_CONST } from '@app/shared/common/constants/gems-common.constant';
+import { PrismaService } from '@app/prisma';
 
 @Injectable()
 export class UserGemService {
-  constructor(private readonly userGemRepository: UserGemRepository) {}
+  constructor(private prisma: PrismaService) {}
 
-  async all(getGemDto: GetGemsDto, userId: number): Promise<UserGemEntity[]> {
+  async all(getGemDto: GetGemsDto, userId: number) {
     const { page, limit } = getGemDto;
-    return this.userGemRepository
-      .createQueryBuilder()
-      .select('*')
-      .where('user_id = :userId', { userId: userId })
-      .andWhere('available_num + attached_num > 0')
-      .orderBy('level', 'DESC')
-      .limit(limit)
-      .offset(limit * (page - 1))
-      .getRawMany();
+    return this.prisma.userGem.findMany({
+      where: {
+        userId: userId,
+        availableNum: { gt: 0 },
+      },
+      orderBy: { level: 'desc' },
+      skip: limit * (page - 1),
+      take: limit,
+    });
   }
 
   isDropGem(): boolean {
@@ -31,69 +31,66 @@ export class UserGemService {
     return false;
   }
 
-  async add(
-    userId: number,
-    type: string = null,
-    level: number = null,
-  ): Promise<boolean> {
-    if (!type) {
-      type = this.randomGemType(GemTypeConstant);
-    }
+  async add(userId: number, type: GemTypeConstant, level: number = null): Promise<boolean> {
     if (!level) {
       level = 1;
     }
-    const existedGem = await this.userGemRepository.findOne({
+    const existedGem = await this.prisma.userGem.findFirst({
       where: {
-        user_id: userId,
+        userId: userId,
         level: level,
         type: type,
       },
     });
     if (existedGem) {
-      await this.userGemRepository.update(
-        {
-          user_id: userId,
-          level: level,
-        },
-        { available_num: () => 'available_num + 1' },
-      );
+      await this.prisma.userGem.update({
+        where: { id: existedGem.id },
+        data: { availableNum: { increment: 1 } },
+      });
     } else {
-      const gem = new UserGemEntity();
-      gem.user_id = userId;
-      gem.level = level;
-      gem.type = type;
-      gem.available_num = 1;
-      gem.attached_num = 0;
-      await gem.save();
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return;
+      }
+
+      await this.prisma.userGem.create({
+        data: {
+          user: {
+            connect: { id: userId },
+          },
+          level: level,
+          type: type,
+          availableNum: 1,
+          attachedNum: 0,
+        }, // Ensure the type matches Prisma schema
+      });
     }
     return true;
   }
 
-  randomGemType(allGemType: object): string {
-    const keys = Object.keys(allGemType);
-    return allGemType[keys[(keys.length * Math.random()) << 0]];
+  randomGemType(enumObj: GemTypeConstant) {
+    const enumValues = Object.values(enumObj);
+    const randomIndex = Math.floor(Math.random() * enumValues.length);
+    return enumValues[randomIndex];
   }
 
-  async levelUp(
-    levelUpGemBody: LevelUpGemDto,
-    userId: number,
-  ): Promise<object> {
+  async levelUp(levelUpGemBody: LevelUpGemDto, userId: number): Promise<object> {
     const level = levelUpGemBody.level;
     const type = levelUpGemBody.type;
     const usedGemNumber = levelUpGemBody.number;
-    const userGems = await this.userGemRepository.findOne({
+    const userGems = await this.prisma.userGem.findFirst({
       where: {
-        user_id: userId,
+        userId: userId,
         type: type,
         level: level,
       },
     });
     console.log('userGems:', userGems);
 
-    if (
-      !userGems ||
-      !this.isEnoughGem(usedGemNumber, userGems?.available_num)
-    ) {
+    if (!userGems || !this.isEnoughGem(usedGemNumber, userGems?.availableNum)) {
       throw new UnprocessableEntityException({
         message: `Your gems not enough`,
       });
@@ -117,17 +114,21 @@ export class UserGemService {
 
   async decreaseGems(
     userId: number,
-    type: string,
+    type: GemTypeConstant,
     level: number,
     usedGemNumber: number,
   ) {
-    await this.userGemRepository.update(
-      {
-        user_id: userId,
+    await this.prisma.userGem.updateMany({
+      where: {
+        userId: userId,
         type: type,
         level: level,
       },
-      { available_num: () => `available_num - ${usedGemNumber}` },
-    );
+      data: {
+        availableNum: {
+          decrement: usedGemNumber,
+        },
+      },
+    });
   }
 }
